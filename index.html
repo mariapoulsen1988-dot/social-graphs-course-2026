@@ -29,7 +29,7 @@
         <li><a href="#week-2">Week 2</a></li>
         <li><a href="#week-3" class="placeholder">Week 3</a></li>
         <li><a href="#week-4" class="placeholder">Week 4</a></li>
-        <li><a href="#week-5" class="placeholder">Week 5</a></li>
+        <li><a href="#week-5">Week 5</a></li>
         <li><a href="#week-6" class="placeholder">Week 6</a></li>
         <li><a href="#week-7" class="placeholder">Week 7</a></li>
         <li><a href="#week-8" class="placeholder">Week 8</a></li>
@@ -212,8 +212,119 @@
       <section id="week-5">
         <div class="week-heading">
           <h2>Week 5</h2>
+          <p class="week-sub">Spiders, Women and Spider-Women</p>
         </div>
-        <p class="empty">Not posted yet.</p>
+        <h3>What I asked</h3>
+        <p>
+          This week the course switches from networks to language, and the
+          Marvel characters finally get their text: all 303 Wikipedia pages.
+          Before counting anything, I wanted to know how much the very first
+          step &mdash; deciding where one word ends and the next begins
+          &mdash; changes what we end up measuring.
+        </p>
+
+        <h3>What I did</h3>
+        <p>
+          I started with one sentence: <em>Spider-Man didn't save Queens;
+          Doctor Strange's portal did!</em> First I split it by hand with my
+          own rules (keep hyphenated names together, split <em>didn't</em>
+          into <em>did</em> + <em>n't</em>, separate punctuation), which gave
+          12 tokens and 11 types. Then I ran the same sentence through spaCy
+          and through <code>o200k_base</code>, the subword tokenizer used by
+          recent OpenAI models. After that I used the same pipeline on one
+          Marvel page, Spider-Woman (Jessica Drew), and finally on all 303
+          pages.
+        </p>
+
+        <h3>What surprised me</h3>
+
+        <h4>Three tokenizers, three answers</h4>
+        <p>
+          Nobody agreed on <em>Spider-Man</em>. I kept it as one token
+          because it is one name. spaCy split it into three
+          (<em>Spider</em>, <em>-</em>, <em>Man</em>), because its rules
+          always split a hyphen between letters. <code>o200k_base</code>
+          made two pieces, <em>Spider</em> and <em>-Man</em>, because both
+          are pieces it has seen often. It also keeps <em>didn't</em> as one
+          piece and glues the space onto the front of each word, so it ends
+          up with 12 pieces against spaCy's 14 tokens.
+        </p>
+
+        <h4>Spider-Woman turns into spiders and women</h4>
+        <p>
+          The Spider-Woman page has 58,042 characters and 11,718 tokens.
+          Lowercasing kept the number of tokens the same but cut the types
+          from 2,619 to 2,451. The top five barely changed: a comma,
+          <em>the</em>, a full stop, a hyphen and <em>and</em>. The hyphen
+          at number four (307 times) was the surprise. <em>Spider-Woman</em>
+          appears 137 times, and spaCy splits every one of them, so once
+          punctuation is gone the page seems to be about spiders and women,
+          not about one person.
+        </p>
+        <p>
+          Her surname has the same problem. <em>Drew</em> is a name, but
+          lowercased it looks like the past tense of <em>draw</em>. If I
+          lowercase before lemmatizing, 94 of the 128 <em>Drew</em>s become
+          the verb <em>draw</em>.
+        </p>
+
+        <h4>One hyphen, a different answer</h4>
+        <p>
+          To test whether this matters for a real question, I asked: how much
+          more often are men mentioned than women across all 303 pages? With
+          spaCy's default (hyphens split), <em>man</em> and <em>men</em>
+          appear 8.9 times as often as <em>woman</em> and <em>women</em>.
+          If hyphenated names are kept together, it drops to 5.1 times. Most
+          of the difference is <em>X-Men</em> (1,494 times), and that
+          is where it gets complicated: <em>X-Men</em> is a team with both
+          male and female members, so it should not count as men, while
+          <em>Spider-Man</em> and <em>Ant-Man</em> really are male characters.
+          Neither number is right. The answer depends on what each name
+          refers to, and a tokenizer can't know that.
+        </p>
+        <p>
+          As a biology bonus, the same trick works on animals:
+          <em>spider</em> drops from 3,407 to 261 when hyphenated names are
+          kept together, so more than 9 out of 10 Marvel spiders are really
+          Spider-Man, Spider-Woman, Spider-Girl or the Spider-Verse. Some
+          animals don't move at all: 293 of the 327 panthers are
+          <em>Black Panther</em>, a name with a space instead of a hyphen,
+          which the hyphen rule can't catch.
+        </p>
+
+        <h4>New words never stop coming</h4>
+        <p>
+          Reading the pages one at a time and counting the types seen so far
+          gives Heaps' law. The curve bends, but it never goes flat: the first
+          half of the pages adds 53 new types per 1,000 tokens, the second
+          half still adds 19. On log-log axes it is close to a straight line
+          with &beta; &asymp; 0.53, which is normal for English text.
+        </p>
+        <figure class="post-figure">
+          <img src="week5_heaps_law.png" alt="Number of different word types seen so far against the number of tokens seen so far, reading the 303 Marvel pages one at a time. Left on linear axes, where the curve bends but keeps rising; right on log-log axes with a Heaps' law fit with beta about 0.53.">
+        </figure>
+        <p>
+          That is exactly why modern models use subwords.
+          <code>o200k_base</code> splits 48% of all Marvel types into more
+          than one piece, and it is mostly names and comic words:
+          <em>Venom</em> becomes <em>Ven&middot;om</em>,
+          <em>Deadpool</em> becomes <em>Dead&middot;pool</em>, and
+          <em>S.H.I.E.L.D.</em> takes seven pieces. Rare words are split the
+          most (68% of words that appear once, against 11% of words that
+          appear 100+ times). These words can be common in Marvel and still
+          rare in the text the tokenizer learned from.
+        </p>
+
+        <h4>What I take from it</h4>
+        <p>
+          Tokenization looks like a boring first step, but it is already a
+          modelling choice. One hyphen rule changed the gender ratio from 9
+          to 5 and removed most of the spiders. And since new words never stop
+          appearing, a model with a fixed list of whole words would always
+          meet words it doesn't know. Subwords solve that by building any new
+          name from pieces it already has &mdash; it just costs more pieces
+          for the rare ones.
+        </p>
       </section>
 
       <section id="week-6">
