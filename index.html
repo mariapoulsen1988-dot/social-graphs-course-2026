@@ -4,10 +4,69 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Graphs and Interactions</title>
+  <link rel="icon" href="favicon.png" type="image/png">
   <link rel="stylesheet" href="style.css">
+  <style>
+    main { position: relative; }   /* anchor for the explorable button */
+
+    /* ---------- Week 5: spider dangling in the header, only while Week 5 is shown ---------- */
+    .hanging-spider {
+      display: none;
+      position: absolute; top: 0; left: calc(max(0px, (100vw - 1400px) / 2) + 220px + 3rem);
+      width: 38px; z-index: 1; pointer-events: none;
+      transform-origin: 19px 0; animation: dangle 5s ease-in-out infinite;
+    }
+    body:has(#week-5:not([hidden])) .hanging-spider { display: block; }
+    .hanging-spider line { stroke: var(--subtext-accent); stroke-width: 1.2; }
+    .hanging-spider .body { fill: var(--accent); }
+    .hanging-spider .leg { stroke: var(--accent); stroke-width: 2.2; fill: none; stroke-linecap: round; }
+    @keyframes dangle {
+      0%, 100% { transform: rotate(-4deg) translateY(0); }
+      50% { transform: rotate(4deg) translateY(10px); }
+    }
+
+    /* ---------- Week 5: explorable button, top-right of the page area ---------- */
+    .explorable-logo {
+      position: absolute; top: 1.25rem; right: 1.25rem; z-index: 5;
+      display: flex; flex-direction: column; align-items: center; gap: 0.35rem; text-decoration: none;
+    }
+    .explorable-logo img {
+      width: 64px; height: 64px; display: block;
+      filter: drop-shadow(0 3px 8px var(--accent-shadow));
+      transition: transform 0.25s ease; animation: logo-sway 4s ease-in-out infinite;
+    }
+    .explorable-logo:hover img { transform: rotate(-12deg) scale(1.08); }
+    .explorable-logo .label {
+      padding: 0.15rem 0.7rem; border-radius: 999px; background: var(--accent); color: var(--accent-text);
+      font-size: 0.72rem; font-weight: 700; line-height: 1.35; text-align: center;
+      box-shadow: 0 2px 8px var(--accent-shadow); transition: transform 0.15s ease;
+    }
+    .explorable-logo:hover .label { transform: translateY(-1px); }
+    .explorable-logo .label small { display: block; font-weight: 400; font-size: 0.66rem; opacity: 0.9; letter-spacing: 0.06em; text-transform: uppercase; }
+    .explorable-logo:focus-visible { outline: 3px solid var(--accent); outline-offset: 4px; border-radius: 12px; }
+    @keyframes logo-sway { 0%, 100% { rotate: -3deg; } 50% { rotate: 3deg; } }
+
+    @media (max-width: 640px) {
+      .hanging-spider { left: 0.6rem; width: 28px; transform-origin: 14px 0; }
+      .explorable-logo { top: 0.8rem; right: 0.8rem; }
+      .explorable-logo img { width: 46px; height: 46px; }
+      .explorable-logo .label { display: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hanging-spider, .explorable-logo img { animation: none; }
+    }
+  </style>
 </head>
 <body>
   <header class="site-header">
+    <svg class="hanging-spider" viewBox="0 0 60 120" aria-hidden="true">
+      <line x1="30" y1="0" x2="30" y2="78"/>
+      <path class="leg" d="M24 84 Q12 76 6 84"/><path class="leg" d="M24 88 Q10 88 4 96"/>
+      <path class="leg" d="M24 92 Q12 98 8 108"/><path class="leg" d="M26 95 Q20 106 18 114"/>
+      <path class="leg" d="M36 84 Q48 76 54 84"/><path class="leg" d="M36 88 Q50 88 56 96"/>
+      <path class="leg" d="M36 92 Q48 98 52 108"/><path class="leg" d="M34 95 Q40 106 42 114"/>
+      <ellipse class="body" cx="30" cy="82" rx="6" ry="6"/><ellipse class="body" cx="30" cy="94" rx="8" ry="10"/>
+    </svg>
     <h1>Social Graphs and Interactions</h1>
     <p class="site-subtitle">
       <a href="#group" class="brain-graph-link" aria-label="Go to Group page">
@@ -210,6 +269,10 @@
       </section>
 
       <section id="week-5">
+        <a class="explorable-logo" href="week5_explorable/index.html" title="Open the explorable: Caught in the Web">
+          <img src="week5_explorable/web-logo.svg" alt="">
+          <span class="label"><small>Explorable</small>Spin the web</span>
+        </a>
         <div class="week-heading">
           <h2>Week 5</h2>
           <p class="week-sub">Spiders, Women and Spider-Women</p>
@@ -442,6 +505,11 @@
     }
     positionNav();
     showWeek(currentWeekId(), false);
+  </script>
+  <script>
+    // Coming back from the explorable (#week-5): show that week, but start at the top of the page
+    // instead of letting the browser jump down to the section.
+    window.addEventListener("load", () => setTimeout(() => window.scrollTo(0, 0), 0));
   </script>
 </body>
 </html>

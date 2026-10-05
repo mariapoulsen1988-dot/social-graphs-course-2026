@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-60 -60 120 120" width="120" height="120" role="img" aria-label="Spin the web">
+  <title>Spin the web</title>
+  <defs>
+    <radialGradient id="glow" cx="0" cy="0" r="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#fbeff7"/>
+      <stop offset="1" stop-color="#f3d4e6"/>
+    </radialGradient>
+  </defs>
+  <!-- Background disc -->
+  <circle r="57" fill="url(#glow)" stroke="#8a0e5c" stroke-width="3"/>
+  <!-- Spokes -->
+  <g stroke="#b8619b" stroke-width="1.6" stroke-linecap="round">
+    <line x1="0" y1="0" x2="0" y2="-52"/><line x1="0" y1="0" x2="37" y2="-37"/>
+    <line x1="0" y1="0" x2="52" y2="0"/><line x1="0" y1="0" x2="37" y2="37"/>
+    <line x1="0" y1="0" x2="0" y2="52"/><line x1="0" y1="0" x2="-37" y2="37"/>
+    <line x1="0" y1="0" x2="-52" y2="0"/><line x1="0" y1="0" x2="-37" y2="-37"/>
+  </g>
+  <!-- Sagging rings -->
+  <g fill="none" stroke="#b8619b" stroke-width="1.6">
+    <path d="M0,-16 Q7,-12 11.3,-11.3 Q12,-7 16,0 Q12,7 11.3,11.3 Q7,12 0,16 Q-7,12 -11.3,11.3 Q-12,7 -16,0 Q-12,-7 -11.3,-11.3 Q-7,-12 0,-16 Z"/>
+    <path d="M0,-30 Q13,-23 21.2,-21.2 Q23,-13 30,0 Q23,13 21.2,21.2 Q13,23 0,30 Q-13,23 -21.2,21.2 Q-23,13 -30,0 Q-23,-13 -21.2,-21.2 Q-13,-23 0,-30 Z"/>
+    <path d="M0,-44 Q19,-34 31.1,-31.1 Q34,-19 44,0 Q34,19 31.1,31.1 Q19,34 0,44 Q-19,34 -31.1,31.1 Q-34,19 -44,0 Q-34,-19 -31.1,-31.1 Q-19,-34 0,-44 Z"/>
+  </g>
+  <!-- The spider, hanging on a thread -->
+  <line x1="22" y1="-52" x2="22" y2="-8" stroke="#8a0e5c" stroke-width="1.4"/>
+  <g transform="translate(22,0)" stroke="#8a0e5c" stroke-width="2.4" stroke-linecap="round" fill="none">
+    <path d="M-3,-4 Q-10,-11 -15,-7"/><path d="M-3,-1 Q-11,-3 -16,2"/>
+    <path d="M-3,2 Q-10,5 -13,11"/><path d="M-2,4 Q-6,10 -7,15"/>
+    <path d="M3,-4 Q10,-11 15,-7"/><path d="M3,-1 Q11,-3 16,2"/>
+    <path d="M3,2 Q10,5 13,11"/><path d="M2,4 Q6,10 7,15"/>
+  </g>
+  <g transform="translate(22,0)" fill="#8a0e5c">
+    <circle cy="-6" r="3.6"/>
+    <ellipse cy="3" rx="5" ry="6.5"/>
+  </g>
+  <!-- Hourglass mark on the back, like Spider-Woman's emblem -->
+  <path transform="translate(22,3)" d="M-2,-3 L2,-3 L0,0 L2,3 L-2,3 L0,0 Z" fill="#ff6ec0"/>
+</svg>

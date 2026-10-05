@@ -1,0 +1,745 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caught in the Web</title>
+  <link rel="icon" href="../favicon.png" type="image/png">
+  <style>
+    /* ---------- Colours: same palette as the GoNuts18 site ---------- */
+    :root {
+      color-scheme: light dark;
+      --bg: #ffffff;
+      --text: #1f2328;
+      --muted: #57606a;
+      --border: #e2e5e9;
+      --card: #ffffff;
+      --soft: #f5f4f5;
+      --accent: #8a0e5c;
+      --accent-2: #b8619b;
+      --header-bg: #fbeff7;
+      --accent-text: #ffffff;
+      --accent-shadow: rgb(138 14 92 / 0.25);
+      --web: #d9c3d2;
+      --before: #c78db6;
+      --after: #d56aa6;
+      --mark: #ffd6ec;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14171a;
+        --text: #e6e8eb;
+        --muted: #9aa4ae;
+        --border: #2c3136;
+        --card: #1b1e22;
+        --soft: #1b191c;
+        --accent: #ff6ec0;
+        --accent-2: #e0a3cc;
+        --header-bg: #2a1b26;
+        --accent-text: #1a0512;
+        --accent-shadow: rgb(255 110 192 / 0.3);
+        --web: #3d2c38;
+        --before: #e3b3d8;
+        --after: #ffadd9;
+        --mark: #5c2148;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+    }
+    code, .mono { font-family: Consolas, Menlo, monospace; font-size: 0.92em; }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      position: relative;
+      overflow: hidden;
+      padding: 3.5rem 1.25rem 2.5rem;
+      text-align: center;
+      background:
+        radial-gradient(circle at 15% 20%, var(--accent-shadow), transparent 40%),
+        radial-gradient(circle at 85% 85%, var(--accent-shadow), transparent 45%),
+        var(--header-bg);
+      border-bottom: 3px solid var(--accent);
+    }
+    .back-btn {
+      position: absolute; top: 1.3rem; left: 1.4rem; z-index: 2;
+      padding: 0.35rem 0.95rem; border: 1px solid var(--accent); border-radius: 999px;
+      background: var(--card); color: var(--accent); font-size: 0.9rem; font-weight: 600; text-decoration: none;
+      box-shadow: 0 2px 8px var(--accent-shadow); transition: background-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .back-btn:hover { background: var(--accent); color: var(--accent-text); transform: translateX(-2px); }
+    @media (max-width: 640px) { .back-btn { top: 0.8rem; left: 0.8rem; font-size: 0.8rem; } }
+    .hanging-spider { position: absolute; top: 0; right: 9%; width: 60px; transform-origin: 30px 0; animation: dangle 5s ease-in-out infinite; }
+    .hanging-spider line { stroke: var(--accent-2); stroke-width: 1.2; }
+    .hanging-spider .body { fill: var(--accent); }
+    .hanging-spider .leg { stroke: var(--accent); stroke-width: 2.2; fill: none; stroke-linecap: round; }
+    @keyframes dangle {
+      0%, 100% { transform: rotate(-4deg) translateY(0); }
+      50% { transform: rotate(4deg) translateY(10px); }
+    }
+    .kicker {
+      display: inline-block;
+      padding: 0.2rem 0.9rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: var(--accent-text);
+      font-size: 0.8rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+    .hero h1 { margin: 0.8rem 0 0.3rem; font-size: clamp(2.2rem, 6vw, 3.6rem); color: var(--accent); line-height: 1.1; }
+    .hero .tagline { margin: 0.2rem auto 0; color: var(--accent-2); font-size: 1.15rem; font-style: italic; }
+
+    /* ---------- Layout ---------- */
+    main { max-width: 1180px; margin: 0 auto; padding: 1.5rem 1.25rem 3rem; }
+    section { padding: 1.5rem 0 1rem; }
+    .section-head { display: flex; align-items: baseline; gap: 0.8rem; }
+    .num { font-size: 2.4rem; font-weight: 800; line-height: 1; color: transparent; -webkit-text-stroke: 2px var(--accent); }
+    h2 { margin: 0; color: var(--accent); font-size: 1.6rem; }
+    .lead { color: var(--muted); margin: 0.4rem 0 1.2rem; max-width: 760px; }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: var(--card);
+      padding: 1.2rem;
+      box-shadow: 0 4px 18px rgb(0 0 0 / 0.04);
+    }
+
+    /* ---------- Controls ---------- */
+    .controls { display: grid; gap: 0.9rem; }
+    .row { display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1.4rem; }
+    .word-box { display: flex; align-items: center; gap: 0.5rem; flex: 1 1 280px; }
+    .word-box label { font-weight: 700; color: var(--accent); }
+    input[type="text"], select {
+      padding: 0.5rem 0.8rem;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--bg);
+      color: var(--text);
+      font: inherit;
+    }
+    input[type="text"] { flex: 1 1 auto; min-width: 0; font-size: 1.1rem; font-weight: 600; }
+    input[type="text"]:focus, select:focus { outline: 2px solid var(--accent); border-color: transparent; }
+    .quick { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .quick button {
+      padding: 0.15rem 0.7rem;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--text);
+      font-family: Consolas, Menlo, monospace;
+      font-size: 0.88rem;
+      cursor: pointer;
+      transition: background-color 0.2s, color 0.2s, transform 0.15s;
+    }
+    .quick button:hover { background: var(--accent); color: var(--accent-text); transform: translateY(-1px); }
+    .switch { display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-size: 0.93rem; }
+    .switch input { display: none; }
+    .switch .track { position: relative; width: 2.4rem; height: 1.35rem; border-radius: 999px; background: var(--border); transition: background-color 0.2s; }
+    .switch .track::after {
+      content: ""; position: absolute; top: 0.15rem; left: 0.15rem;
+      width: 1.05rem; height: 1.05rem; border-radius: 50%; background: #fff;
+      transition: transform 0.2s; box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+    }
+    .switch input:checked + .track { background: var(--accent); }
+    .switch input:checked + .track::after { transform: translateX(1.05rem); }
+    .slider { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.93rem; }
+    .slider b { color: var(--accent); min-width: 1rem; display: inline-block; }
+    #depth-val { min-width: 4.2rem; }
+    .slider input { accent-color: var(--accent); width: 120px; }
+
+    /* ---------- Stage: web + panel ---------- */
+    .stage { display: grid; grid-template-columns: minmax(0, 2.3fr) minmax(250px, 1fr); gap: 1.2rem; margin-top: 1rem; align-items: start; }
+    @media (max-width: 860px) { .stage { grid-template-columns: 1fr; } }
+    .web-box { position: relative; }
+    .clear-btn {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%); z-index: 2;
+      padding: 0.3rem 0.9rem; border: 1px solid var(--accent); border-radius: 999px;
+      background: var(--card); color: var(--accent); font: inherit; font-size: 0.88rem; cursor: pointer;
+      transition: background-color 0.2s, color 0.2s, opacity 0.2s;
+    }
+    .clear-btn:hover:not(:disabled) { background: var(--accent); color: var(--accent-text); }
+    .clear-btn:disabled { opacity: 0; pointer-events: none; }
+    #web { width: 100%; height: auto; display: block; cursor: default; }
+    #web .loading-msg { fill: var(--accent); font-size: 20px; animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 0.35; } 50% { opacity: 1; } }
+    #web .bg-web { stroke: var(--web); stroke-width: 1; fill: none; }
+    #web .side-label { font-size: 17px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+    #web .side-label.before, #web .node.before text { fill: var(--before); }
+    #web .side-label.after, #web .node.after text { fill: var(--after); }
+    #web .half.before,
+    #web .half.after { fill: color-mix(in srgb, var(--accent) 7%, transparent); }
+    #web .edge { fill: none; stroke-linecap: round; opacity: 0.75; transition: opacity 0.25s; }
+    #web .edge.after { stroke: var(--after); }
+    #web .edge.before { stroke: var(--before); }
+    #web .edge.draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 0.8s ease forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    #web .node { cursor: pointer; opacity: 0; animation: fade 0.5s ease forwards; }
+    @keyframes fade { to { opacity: 1; } }
+    #web .node circle { stroke-width: 2; fill: var(--card); transition: fill 0.2s; }
+    #web .node.after circle { stroke: var(--after); }
+    #web .node.before circle { stroke: var(--before); }
+    #web .node text { paint-order: stroke; stroke: var(--card); stroke-width: 3px; stroke-linejoin: round; }
+    #web .node:hover circle, #web .node.on circle { fill: var(--accent); }
+    #web .node.before:hover circle, #web .node.before.on circle { fill: var(--before); }
+    #web .node.after:hover circle, #web .node.after.on circle { fill: var(--after); }
+    #web.focus .edge:not(.on) { opacity: 0.12; }
+    #web.focus .node:not(.on) { opacity: 0.35 !important; }
+    #web .edge.on { opacity: 1 !important; }
+    #web .edge.after.on, #web .edge.before.on { stroke: var(--accent); }
+    #web .node.after.on circle, #web .node.before.on circle { fill: var(--accent); stroke: var(--accent); }
+    #web .node.after.on text, #web .node.before.on text { fill: var(--accent); }
+    /* glow around the chosen path: hot pink on the right, orchid pink on the left */
+    #web .edge.after.on { filter: drop-shadow(0 0 4px #ff6ec0) drop-shadow(0 0 9px rgb(255 110 192 / 0.55)); }
+    #web .edge.before.on { filter: drop-shadow(0 0 4px #e59ad8) drop-shadow(0 0 9px rgb(229 154 216 / 0.6)); }
+    #web .node.on circle { stroke-width: 3.5; }
+    #web .node.on text { font-weight: 800 !important; font-size: 1.15em; }
+    #web.focus .node.can { opacity: 1 !important; }
+    #web.focus .edge.can { opacity: 0.9; }
+    #web.focus .node.alt { opacity: 0.32 !important; }
+    #web.focus .node.alt:hover { opacity: 0.85 !important; }
+    #web.focus .edge.alt { opacity: 0.16 !important; }
+    #web.focus .node.off { opacity: 0.14 !important; pointer-events: none; }
+    #web.focus .edge.off { opacity: 0.07 !important; }
+    #web .center circle { fill: var(--accent); filter: drop-shadow(0 4px 10px var(--accent-shadow)); }
+    #web .center text { fill: var(--accent-text); font-weight: 800; }
+    #web .empty-msg { fill: var(--muted); font-size: 15px; }
+
+    .panel { border: 1px solid var(--border); border-radius: 16px; background: var(--soft); padding: 1rem 1.1rem; }
+    .panel h3 { margin: 0 0 0.3rem; color: var(--accent); font-size: 1.15rem; }
+    .panel .phrase { display: flex; flex-wrap: wrap; gap: 0.3rem; margin: 0.3rem 0 0.6rem; }
+    .panel .tok { padding: 0.05rem 0.55rem; border-radius: 8px; background: var(--card); border: 1px solid var(--border); font-family: Consolas, Menlo, monospace; }
+    .panel .tok.center { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+    .panel .tok.before { color: var(--before); border-color: var(--before); font-weight: 700; }
+    .panel .tok.after { color: var(--after); border-color: var(--after); font-weight: 700; }
+    .facts { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; margin: 0.6rem 0 0.4rem; }
+    .fact { background: var(--card); border: 1px solid var(--border); border-radius: 10px; padding: 0.35rem 0.6rem; font-size: 0.82rem; color: var(--muted); }
+    .fact b { display: block; font-size: 1.15rem; color: var(--text); }
+    .fact.before b { color: var(--before); }
+    .fact.after b { color: var(--after); }
+    .tops { margin: 0.4rem 0 0; padding: 0; list-style: none; font-size: 0.88rem; }
+    .tops li { margin: 0.2rem 0; }
+    .divider { border: 0; border-top: 1px dashed var(--border); margin: 0.9rem 0 0.7rem; }
+    .panel .meta { color: var(--muted); font-size: 0.9rem; }
+    .panel .meta b { color: var(--text); }
+    .kwic { list-style: none; margin: 0.7rem 0 0; padding: 0; display: grid; gap: 0.55rem; }
+    .kwic li { font-size: 0.86rem; line-height: 1.45; padding: 0.5rem 0.6rem; border-radius: 10px; background: var(--card); border: 1px solid var(--border); }
+    .kwic .src { display: block; color: var(--accent-2); font-size: 0.78rem; font-weight: 600; }
+    .kwic mark { background: var(--mark); color: inherit; border-radius: 4px; padding: 0 2px; font-weight: 700; }
+    .kwic.before mark { background: color-mix(in srgb, var(--before) 25%, transparent); }
+    .hint { color: var(--muted); font-size: 0.88rem; font-style: italic; }
+
+    details.how { margin: -0.4rem 0 1.2rem; max-width: 760px; }
+    details.how summary { cursor: pointer; color: var(--accent); font-weight: 700; width: fit-content; }
+    details.how summary:hover { text-decoration: underline; }
+    details.how p { margin: 0.5rem 0; }
+    .how h3 { margin: 0.8rem 0 0.3rem; color: var(--accent-2); font-size: 1.05rem; }
+    .how ul { margin: 0; }
+    .how li { margin: 0.3rem 0; }
+
+    footer { max-width: 1180px; margin: 0 auto; padding: 1rem 1.25rem 2rem; border-top: 1px solid var(--border); color: var(--muted); font-size: 0.875rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { animation-duration: 0.01ms !important; animation-delay: 0ms !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ================= HERO ================= -->
+  <header class="hero">
+    <a class="back-btn" href="../index.html#week-5">← Back to Week 5</a>
+    <svg class="hanging-spider" viewBox="0 0 60 120" aria-hidden="true">
+      <line x1="30" y1="0" x2="30" y2="78"/>
+      <path class="leg" d="M24 84 Q12 76 6 84"/><path class="leg" d="M24 88 Q10 88 4 96"/>
+      <path class="leg" d="M24 92 Q12 98 8 108"/><path class="leg" d="M26 95 Q20 106 18 114"/>
+      <path class="leg" d="M36 84 Q48 76 54 84"/><path class="leg" d="M36 88 Q50 88 56 96"/>
+      <path class="leg" d="M36 92 Q48 98 52 108"/><path class="leg" d="M34 95 Q40 106 42 114"/>
+      <ellipse class="body" cx="30" cy="82" rx="6" ry="6"/><ellipse class="body" cx="30" cy="94" rx="8" ry="10"/>
+    </svg>
+
+    <span class="kicker">Week 5 · Explorable</span>
+    <h1>Caught in the Web</h1>
+    <p class="tagline">With great vocabulary comes great responsibility</p>
+  </header>
+
+  <main>
+    <!-- ================= THE WEB ================= -->
+    <section id="web-section">
+      <div class="section-head"><h2>Spin the web</h2></div>
+      <p class="lead">The right side of the web holds the words that come <em>after</em> your word, the left side the words that come <em>before</em> it. Thicker threads mean more frequent n-grams. Click any word on the web to read the real sentences behind that thread.</p>
+      <details class="how">
+        <summary>How it works</summary>
+        <p>All 303 Marvel Wikipedia pages from the course data are stored inside this page. When you type a word, your browser finds every place it occurs and looks at its neighbours: the word just before and just after it, and then two and three steps away. Every time you flip a switch, the text is cut into words again and a new web is spun.</p>
+        <div class="how">
+          <h3>The details, and what to be careful with</h3>
+          <ul>
+            <li><b>What counts as a word:</b> the text is cut into pieces (tokens) at every space and every punctuation mark. A comma or a bracket becomes a piece of its own, and so does the ending <code>'s</code>. So <em>Death's Head</em> becomes three pieces: <code>death</code> <code>'s</code> <code>head</code>.</li>
+            <li><b>Hyphens:</b> a hyphen also cuts a word in two, so <em>Spider-Woman</em> becomes <code>spider</code> <code>-</code> <code>woman</code>. Turn on <em>keep hyphenated words whole</em> to keep it as one word: <code>spider-woman</code>.</li>
+            <li><b>One page at a time:</b> a thread never jumps from one page to the next. All the words in an n-gram come from the same page.</li>
+            <li><b>Only the biggest threads are drawn:</b> the <em>threads</em> slider decides how many branches each word gets. The smaller ones are still counted, just not drawn.</li>
+            <li><b>Left and right are counted separately:</b> a word on the left and a word on the right don't always appear in the same sentence. Click one on each side to see where they really meet. Words that never appear with your pick fade out.</li>
+            <li><b>Thickness:</b> the thicker the thread, the more common the n-gram. Thickness grows with the square root of the count, so rare threads stay visible next to very common ones.</li>
+            <li><b>Removing stopwords:</b> small words like <em>the</em> and <em>of</em> are deleted before counting. So two words that had a small word between them can end up side by side as a bigram.</li>
+          </ul>
+        </div>
+      </details>
+
+      <div class="card">
+        <div class="controls">
+          <div class="row">
+            <div class="word-box">
+              <label for="word">🕷️ Word</label>
+              <input type="text" id="word" value="spider" autocomplete="off" spellcheck="false">
+            </div>
+            <label class="slider" for="corpus">Pages
+              <select id="corpus"></select>
+            </label>
+          </div>
+          <div class="quick" id="quick"></div>
+          <div class="row">
+            <label class="switch"><input type="checkbox" id="opt-lower" checked><span class="track"></span>lowercase</label>
+            <label class="switch"><input type="checkbox" id="opt-hyphen"><span class="track"></span>keep hyphenated words whole</label>
+            <label class="switch"><input type="checkbox" id="opt-punct" checked><span class="track"></span>keep punctuation</label>
+            <label class="switch"><input type="checkbox" id="opt-stop"><span class="track"></span>remove stopwords</label>
+          </div>
+          <div class="row">
+            <label class="slider">n-grams <input type="range" id="depth" min="1" max="3" value="2"><b id="depth-val">trigram</b></label>
+            <label class="slider">threads <input type="range" id="branch" min="2" max="8" value="4"><b id="branch-val">4</b></label>
+          </div>
+        </div>
+
+        <div class="stage">
+          <div class="web-box">
+            <button class="clear-btn" id="clear" disabled>↺ Clear selection</button>
+            <svg id="web" viewBox="-430 -322 860 644" role="img" aria-label="Word web around the chosen word"><text class="loading-msg" x="0" y="0" text-anchor="middle">🕷️ Spinning the web… reading 303 pages</text></svg>
+          </div>
+          <aside class="panel" id="panel"><p class="hint">Loading the Marvel pages…</p></aside>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer>
+    Week 5 explorable · GoNuts18 · 02805 Social Graphs and Interactions
+  </footer>
+
+  <script src="pages_data.js"></script>
+  <script>
+    "use strict";
+    const $ = id => document.getElementById(id);
+    const TITLES = Object.keys(PAGES);
+    const TEXTS = Object.values(PAGES);
+    const pretty = t => t.replace(/_/g, " ");
+    const escapeHtml = s => s.replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+    const STOPWORDS = new Set(("a an the and or but nor so of to in on at by for with from as into onto about over " +
+      "under after before than then is are was were be been being am it its it's he him his she her hers they them " +
+      "their theirs we us our you your i me my this that these those which who whom whose what when where while " +
+      "not no also has have had do does did can could would should will may might must 's").split(" "));
+
+    // ---------------- Tokenizing (cached per set of switches) ----------------
+    const cache = new Map();
+    function tokenizeCorpus(opt) {
+      const key = JSON.stringify(opt);
+      if (cache.has(key)) return cache.get(key);
+      const wordRe = opt.hyphen
+        ? /[\p{L}\p{N}]+(?:[-'’][\p{L}\p{N}]+)*|[^\s\p{L}\p{N}]/gu
+        : /['’]s\b|[\p{L}\p{N}]+|[^\s\p{L}\p{N}]/gu;
+      const hasWordChar = /[\p{L}\p{N}]/u;
+      const tokens = [], starts = [], ends = [], pages = [];
+      TEXTS.forEach((text, p) => {
+        wordRe.lastIndex = 0;
+        let m;
+        while ((m = wordRe.exec(text))) {
+          let t = m[0];
+          if (!opt.punct && !hasWordChar.test(t)) continue;
+          t = t.replace("’", "'");
+          if (opt.lower) t = t.toLowerCase();
+          if (opt.stop && STOPWORDS.has(t.toLowerCase())) continue;
+          tokens.push(t); starts.push(m.index); ends.push(m.index + m[0].length); pages.push(p);
+        }
+      });
+      const index = new Map();
+      tokens.forEach((t, i) => { let a = index.get(t); if (!a) index.set(t, a = []); a.push(i); });
+      const result = { tokens, starts, ends, pages, index };
+      cache.set(key, result);
+      return result;
+    }
+
+    // ---------------- Counting the threads ----------------
+    function growTree(T, positions, dir, depth) {
+      const root = { kids: new Map(), count: positions.length, depth: 0 };
+      for (const p of positions) {
+        let node = root;
+        for (let d = 1; d <= depth; d++) {
+          const q = p + dir * d;
+          if (q < 0 || q >= T.tokens.length || T.pages[q] !== T.pages[p]) break;
+          const w = T.tokens[q];
+          let kid = node.kids.get(w);
+          if (!kid) {
+            kid = { w, count: 0, occ: [], pages: new Set(), kids: new Map(), depth: d, dir, parent: node };
+            node.kids.set(w, kid);
+          }
+          kid.count++;
+          kid.pages.add(T.pages[p]);
+          kid.occ.push(p);
+          node = kid;
+        }
+      }
+      return root;
+    }
+
+    // Give each branch a slice of its parent's angle, wider for more frequent branches
+    function layoutTree(node, a0, a1, branches, out) {
+      const kids = [...node.kids.values()].sort((x, y) => y.count - x.count).slice(0, branches);
+      if (!kids.length) return;
+      // Half of the angle is shared equally (so small branches stay readable), half by frequency
+      const weights = kids.map(k => Math.pow(k.count, 0.6));
+      const total = weights.reduce((s, w) => s + w, 0);
+      let a = a0;
+      kids.forEach((k, i) => {
+        const span = (a1 - a0) * (0.5 / kids.length + 0.5 * weights[i] / total);
+        k.a0 = a; k.a1 = a + span; k.angle = a + span / 2;
+        a += span;
+        out.push(k);
+        layoutTree(k, k.a0, k.a1, branches, out);
+      });
+    }
+
+    // ---------------- Drawing ----------------
+    const SVG = "http://www.w3.org/2000/svg";
+    function el(tag, attrs = {}, parent) {
+      const e = document.createElementNS(SVG, tag);
+      for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, v);
+      if (parent) parent.appendChild(e);
+      return e;
+    }
+    const NGRAM_NAMES = { 1: "bigram", 2: "trigram", 3: "4-gram" };
+    const RADII = { 1: [0, 190], 2: [0, 140, 270], 3: [0, 110, 205, 295] };
+    const DEG = Math.PI / 180;
+    const polar = (r, a) => [r * Math.cos(a), r * Math.sin(a)];
+
+    function drawBackground(svg) {
+      // Tint the two halves of the web: before (left) and after (right)
+      el("path", { d: "M0,-318 A318,318 0 0 0 0,318 Z", class: "half before" }, svg);
+      el("path", { d: "M0,-318 A318,318 0 0 1 0,318 Z", class: "half after" }, svg);
+      const g = el("g", { "aria-hidden": "true" }, svg);
+      const spokes = 24;
+      for (let i = 0; i < spokes; i++) {
+        const [x, y] = polar(320, i * 2 * Math.PI / spokes);
+        el("line", { x1: 0, y1: 0, x2: x, y2: y, class: "bg-web" }, g);
+      }
+      for (let r = 55; r <= 320; r += 53) {
+        let d = "";
+        for (let i = 0; i <= spokes; i++) {
+          const [x, y] = polar(r, i * 2 * Math.PI / spokes);
+          const [cx, cy] = polar(r * 0.94, (i - 0.5) * 2 * Math.PI / spokes);   // sagging threads
+          d += i === 0 ? `M${x},${y}` : ` Q${cx},${cy} ${x},${y}`;
+        }
+        el("path", { d, class: "bg-web" }, g);
+      }
+      el("text", { x: -420, y: -296, class: "side-label before" }, svg).textContent = "words before";
+      el("text", { x: 420, y: -296, class: "side-label after", "text-anchor": "end" }, svg).textContent = "words after";
+    }
+
+    let state = { word: "spider", corpus: -1, depth: 2, branches: 4, opt: { lower: true, hyphen: false, punct: true, stop: false } };
+    let picked = { before: null, after: null };   // one chosen thread per side
+    let current = null;   // { T, positions, nodes, word }
+
+    function spin(selectPath) {
+      const T = tokenizeCorpus(state.opt);
+
+      const query = state.opt.lower ? state.word.trim().toLowerCase() : state.word.trim();
+      let positions = T.index.get(query) || [];
+      if (state.corpus >= 0) positions = positions.filter(p => T.pages[p] === state.corpus);
+
+      const svg = $("web");
+      svg.innerHTML = "";
+      svg.classList.remove("focus");
+      picked = { before: null, after: null };
+      $("clear").disabled = true;
+      drawBackground(svg);
+
+      if (!positions.length) {
+        el("circle", { r: 46 }, el("g", { class: "center" }, svg));
+        el("text", { y: 80, "text-anchor": "middle", class: "empty-msg" }, svg).textContent =
+          query ? `"${query}" is not in ${state.corpus >= 0 ? "this page" : "these pages"} with these settings. Try another word!` : "Type a word to spin a web.";
+        current = null;
+        showSummary();
+        return;
+      }
+
+      const after = growTree(T, positions, +1, state.depth);
+      const before = growTree(T, positions, -1, state.depth);
+      const nodes = [];
+      layoutTree(after, -72 * DEG, 72 * DEG, state.branches, nodes);
+      layoutTree(before, 108 * DEG, 252 * DEG, state.branches, nodes);
+
+      const R = RADII[state.depth];
+      const maxCount = Math.max(1, ...nodes.filter(n => n.depth === 1).map(n => n.count));
+      const edgeLayer = el("g", {}, svg);
+      const nodeLayer = el("g", {}, svg);
+
+      nodes.forEach(n => {
+        const side = n.dir > 0 ? "after" : "before";
+        const strength = Math.sqrt(n.count / maxCount);
+        const rp = R[n.depth - 1], rc = R[n.depth];
+        const [px, py] = n.depth === 1 ? [0, 0] : polar(rp, n.parent.angle);
+        const [kx, ky] = polar((rp + rc) / 2, n.angle);
+        const [x, y] = polar(rc, n.angle);
+        n.x = x; n.y = y;
+
+        n.edgeEl = el("path", {
+          d: `M${px},${py} Q${kx},${ky} ${x},${y}`,
+          class: `edge draw ${side}`,
+          pathLength: 1,
+          "stroke-width": (1.2 + 9 * strength).toFixed(2),
+          style: `animation-delay:${(n.depth - 1) * 0.35}s`,
+        }, edgeLayer);
+
+        const g = el("g", { class: `node ${side}`, transform: `translate(${x},${y})`,
+          style: `animation-delay:${0.25 + (n.depth - 1) * 0.35}s` }, nodeLayer);
+        el("circle", { r: (3.5 + 5.5 * strength).toFixed(1) }, g);
+        const right = Math.cos(n.angle) >= 0;
+        const label = el("text", {
+          x: right ? 11 : -11, y: 5,
+          "text-anchor": right ? "start" : "end",
+          "font-size": ((14 + 8 * strength) * Math.pow(0.86, n.depth - 1)).toFixed(1),
+          "font-weight": n.depth === 1 ? 700 : 500,
+        }, g);
+        label.textContent = n.w;
+        n.tip = `${phraseOf(n, query).join(" ")}  ·  ${n.count.toLocaleString("en")} times`;
+        n.titleEl = el("title", {}, g);
+        n.titleEl.textContent = n.tip;
+        g.addEventListener("click", ev => { ev.stopPropagation(); select(n); });
+        n.el = g;
+      });
+
+      // The word in the middle
+      const c = el("g", { class: "center" }, svg);
+      const r = Math.max(42, Math.min(70, 12 + query.length * 7));
+      el("circle", { r }, c);
+      el("text", { y: 6, "text-anchor": "middle", "font-size": query.length > 9 ? 15 : 19 }, c).textContent = query;
+
+      current = { T, positions, nodes, word: query, after, before };
+      current.pageCount = new Set(positions.map(p => T.pages[p])).size;
+
+      // A preset can pick one thread, or one on each side ([before, after])
+      let chosen = false;
+      for (const sp of [].concat(selectPath || [])) {
+        const target = nodes.find(n => n.dir === sp.dir && phraseOf(n, query).join(" ") === sp.phrase);
+        if (target) { select(target); chosen = true; }
+      }
+      if (!chosen) showSummary();
+    }
+
+    // The n-gram a node stands for, in reading order
+    function phraseOf(n, word) {
+      const path = [];
+      for (let k = n; k && k.depth > 0; k = k.parent) path.push(k.w);
+      return n.dir > 0 ? [word, ...path.reverse()] : [...path, word];
+    }
+
+    // The fact box: facts about the word in the middle, always at the top of the panel
+    function factsHtml() {
+      const { word, positions, before, after, pageCount } = current;
+      const top = (tree, dir) => {
+        const k = [...tree.kids.values()].sort((a, b) => b.count - a.count)[0];
+        if (!k) return "";
+        const share = Math.round(100 * k.count / positions.length);
+        const chips = dir > 0
+          ? `<span class="tok center">${escapeHtml(word)}</span> <span class="tok after">${escapeHtml(k.w)}</span>`
+          : `<span class="tok before">${escapeHtml(k.w)}</span> <span class="tok center">${escapeHtml(word)}</span>`;
+        return `<li>Most common ${dir > 0 ? "after" : "before"}: ${chips} <small>${share}%</small></li>`;
+      };
+      return `<h3>🕷️ ${escapeHtml(word)}</h3>
+        <div class="facts">
+          <div class="fact"><b>${positions.length.toLocaleString("en")}</b>occurrences</div>
+          <div class="fact"><b>${pageCount}</b>page${pageCount === 1 ? "" : "s"}</div>
+          <div class="fact before"><b>${before.kids.size.toLocaleString("en")}</b>different words before</div>
+          <div class="fact after"><b>${after.kids.size.toLocaleString("en")}</b>different words after</div>
+        </div>
+        <ul class="tops">${top(current.before, -1)}${top(current.after, 1)}</ul>`;
+    }
+
+    function showSummary() {
+      const panel = $("panel");
+      if (!current) {
+        panel.innerHTML = `<h3>Nothing caught yet</h3><p class="hint">Pick a word above to spin a web.</p>`;
+        return;
+      }
+      panel.innerHTML = factsHtml() +
+        `<hr class="divider"><p class="hint">Click a word on the web to follow that thread to the sentences it came from.</p>`;
+    }
+
+    // Pick threads step by step. On each side you build a path outward from the middle word:
+    // click a highlighted word to go further, click your last word again to step back.
+    function select(n) {
+      if (!current) return;
+      if (!n) {
+        picked = { before: null, after: null };
+      } else {
+        const side = n.dir > 0 ? "after" : "before";
+        const last = picked[side];
+        let onPath = false;
+        for (let k = last; k && k.depth > 0; k = k.parent) if (k === n) onPath = true;
+        if (n === last) picked[side] = n.parent.depth > 0 ? n.parent : null;   // step back one ring
+        else picked[side] = n;                                                  // step forward, or back to an earlier word
+      }
+      current.nodes.forEach(k => {
+        k.el.classList.remove("on"); k.edgeEl.classList.remove("on"); k.edgeEl.style.strokeWidth = "";
+      });
+      [picked.before, picked.after].forEach(sel => {
+        for (let k = sel; k && k.depth > 0; k = k.parent) {
+          k.el.classList.add("on");
+          k.edgeEl.classList.add("on");
+          // the chosen path: thicker than its normal thread
+          k.edgeEl.style.strokeWidth = (parseFloat(k.edgeEl.getAttribute("stroke-width")) * 1.4 + 3).toFixed(1);
+        }
+      });
+      markOptions();
+      const any = picked.before || picked.after;
+      $("clear").disabled = !any;
+      $("web").classList.toggle("focus", !!any);
+      if (any) showThread(); else showSummary();
+    }
+
+    // Which words can be clicked? Every word that really occurs together with your pick on the
+    // other side (on the same side, clicking another word just switches your pick).
+    // Words that never meet your pick fade out.
+    function markOptions() {
+      const any = picked.before || picked.after;
+      const partnerOf = {
+        after: picked.before ? new Set(picked.before.occ) : null,
+        before: picked.after ? new Set(picked.after.occ) : null,
+      };
+      current.nodes.forEach(k => {
+        k.el.classList.remove("can", "alt", "off");
+        k.edgeEl.classList.remove("can", "alt", "off");
+        k.titleEl.textContent = k.tip;
+        if (!any || k.el.classList.contains("on")) return;
+        const side = k.dir > 0 ? "after" : "before";
+        const partner = partnerOf[side];
+        const together = partner ? k.occ.reduce((c, p) => c + (partner.has(p) ? 1 : 0), 0) : k.count;
+        // On the side you picked: words further out continue your n-gram (bright),
+        // the other words on that side are alternatives you can switch to (faint, still clickable)
+        let further = !picked[side];
+        for (let q = k.parent; !further && q && q.depth > 0; q = q.parent) if (q === picked[side]) further = true;
+        const cls = together === 0 ? "off" : further ? "can" : "alt";
+        k.el.classList.add(cls);
+        k.edgeEl.classList.add(cls);
+        if (cls === "can" && partner) k.titleEl.textContent = `${k.tip}  ·  ${together} together with your pick`;
+      });
+    }
+
+    // The panel for the picked thread(s): the n-gram, how often, and real sentences from the pages
+    function showThread() {
+      const { T, word } = current;
+      const b = picked.before, a = picked.after;
+      const nb = b ? b.depth : 0, na = a ? a.depth : 0;
+
+      // Occurrences of the middle word where the picked thread(s) really appear
+      let occ = b ? b.occ : a.occ;
+      if (b && a) { const inAfter = new Set(a.occ); occ = b.occ.filter(p => inAfter.has(p)); }
+
+      const beforeWords = b ? phraseOf(b, word).slice(0, -1) : [];
+      const afterWords = a ? phraseOf(a, word).slice(1) : [];
+      const toks = beforeWords.map(t => `<span class="tok before">${escapeHtml(t)}</span>`).join("") +
+        `<span class="tok center">${escapeHtml(word)}</span>` +
+        afterWords.map(t => `<span class="tok after">${escapeHtml(t)}</span>`).join("");
+      const n = 1 + nb + na;
+      const name = n === 2 ? "Bigram" : n === 3 ? "Trigram" : `${n}-gram`;
+      const side = b && a ? "before and after" : b ? "before" : "after";
+      const pages = new Set(occ.map(p => T.pages[p])).size;
+      const share = Math.round(100 * occ.length / current.positions.length);
+
+      // Prefer examples from different pages
+      const seen = new Set(), picks = [];
+      for (const p of occ) { if (!seen.has(T.pages[p])) { seen.add(T.pages[p]); picks.push(p); } if (picks.length === 5) break; }
+      for (const p of occ) { if (picks.length === 5) break; if (!picks.includes(p)) picks.push(p); }
+
+      const clean = str => escapeHtml(str.replace(/\s*\n+\s*/g, " ⏎ "));
+      const lines = picks.map(p => {
+        const text = TEXTS[T.pages[p]];
+        const s = T.starts[p - nb], e = T.ends[p + na];
+        const left = text.slice(Math.max(0, s - 90), s), right = text.slice(e, e + 90);
+        return `<li><span class="src">${escapeHtml(pretty(TITLES[T.pages[p]]))}</span>…${clean(left)}<mark>${clean(text.slice(s, e))}</mark>${clean(right)}…</li>`;
+      }).join("");
+
+      const body = occ.length
+        ? `<div class="meta"><b>${occ.length.toLocaleString("en")}</b> time${occ.length === 1 ? "" : "s"} · ${share}% of all <span class="mono">${escapeHtml(word)}</span> · on <b>${pages}</b> page${pages === 1 ? "" : "s"}</div>
+           <ul class="kwic ${b && !a ? "before" : "after"}">${lines}</ul>
+           <p class="hint">Highlighted: the exact characters behind the tokens. ⏎ marks a line break in the page.</p>`
+        : `<p class="meta">These two threads never meet: no sentence has them before and after <span class="mono">${escapeHtml(word)}</span> at the same time. The two halves of the web are counted separately, so not every pair belongs together.</p>`;
+      const tip = `<p class="hint">Click a highlighted word to go further on either side. Click your last word again to step back.</p>`;
+
+      $("panel").innerHTML = factsHtml() +
+        `<hr class="divider"><h3>${name} ${side}</h3><div class="phrase">${toks}</div>${body}${tip}`;
+    }
+
+    // ---------------- Controls ----------------
+    function readControls() {
+      state.word = $("word").value;
+      state.corpus = +$("corpus").value;
+      state.depth = +$("depth").value;
+      state.branches = +$("branch").value;
+      state.opt = { lower: $("opt-lower").checked, hyphen: $("opt-hyphen").checked, punct: $("opt-punct").checked, stop: $("opt-stop").checked };
+      $("depth-val").textContent = NGRAM_NAMES[state.depth];
+      $("branch-val").textContent = state.branches;
+    }
+    function writeControls() {
+      $("word").value = state.word;
+      $("corpus").value = state.corpus;
+      $("depth").value = state.depth;
+      $("branch").value = state.branches;
+      $("opt-lower").checked = state.opt.lower;
+      $("opt-hyphen").checked = state.opt.hyphen;
+      $("opt-punct").checked = state.opt.punct;
+      $("opt-stop").checked = state.opt.stop;
+      $("depth-val").textContent = NGRAM_NAMES[state.depth];
+      $("branch-val").textContent = state.branches;
+    }
+
+    // Pages menu: all pages, the spider family, then every page
+    (function fillCorpus() {
+      const sel = $("corpus");
+      const favourites = ["Spider-Woman_(Jessica_Drew)", "Mayday_Parker", "Spider-Woman_(Gwen_Stacy)", "Silk_(character)", "Spider-Man"];
+      let html = `<option value="-1">All 303 pages</option><optgroup label="Spider family">`;
+      favourites.forEach(t => { const i = TITLES.indexOf(t); if (i >= 0) html += `<option value="${i}">${escapeHtml(pretty(t))}</option>`; });
+      html += `</optgroup><optgroup label="Every page">`;
+      TITLES.map((t, i) => [pretty(t), i]).sort((a, b) => a[0].localeCompare(b[0]))
+        .forEach(([t, i]) => { html += `<option value="${i}">${escapeHtml(t)}</option>`; });
+      sel.innerHTML = html + "</optgroup>";
+    })();
+
+    ["spider", "woman", "jessica", "may", "head", "power", "hydra"].forEach(w => {
+      const b = document.createElement("button");
+      b.textContent = w;
+      b.addEventListener("click", () => { $("word").value = w; readControls(); spin(); });
+      $("quick").appendChild(b);
+    });
+
+    $("clear").addEventListener("click", () => select(null));
+
+    let typing;
+    $("word").addEventListener("input", () => { clearTimeout(typing); typing = setTimeout(() => { readControls(); spin(); }, 350); });
+    ["corpus", "depth", "branch", "opt-lower", "opt-hyphen", "opt-punct", "opt-stop"]
+      .forEach(id => $(id).addEventListener("input", () => { readControls(); spin(); }));
+
+    // Let the page (with its loading message) appear first, then do the heavy tokenizing
+    writeControls();
+    requestAnimationFrame(() => setTimeout(spin, 30));
+  </script>
+
+</body>
+</html>
